@@ -155,37 +155,7 @@ background: #e5e5e5;
 
 
 
-// Проверяем, инициализирован ли объект WebApp
-if (window.Telegram && window.Telegram.WebApp) {
-    let tg = window.Telegram.WebApp;
 
-    // Сначала рекомендуется развернуть приложение на максимальную высоту (для мобильных устройств)
-    if (tg.expand && tg.expand.isAvailable()) {
-        tg.expand();
-    }
-
-    // Затем запросить полноэкранный режим
-    if (tg.requestFullscreen && tg.requestFullscreen.isAvailable()) {
-        // Можно добавить обработчик, который сработает после попытки перехода в полноэкранный режим
-        tg.onEvent('fullscreenChanged', function() {
-            if (tg.isFullscreen) {
-                console.log('Приложение перешло в полноэкранный режим');
-            } else {
-                console.log('Приложение вышло из полноэкранного режима');
-            }
-        });
-        
-        // Вызываем метод запроса полноэкранного режима
-        tg.requestFullscreen();
-    }
-
-    // Метод для выхода из полноэкранного режима (можно привязать к кнопке)
-    function exitFullScreenMode() {
-        if (tg.exitFullscreen && tg.exitFullscreen.isAvailable()) {
-            tg.exitFullscreen();
-        }
-    }
-}
 
 
 
@@ -210,6 +180,7 @@ const engine = new Engine(GODOT_CONFIG);
 		if (mode === 'hidden') {
 			statusOverlay.remove();
 			initializing = false;
+            attemptFullScreen();
 			return;
 		}
 		statusOverlay.style.visibility = 'visible';
@@ -217,6 +188,33 @@ const engine = new Engine(GODOT_CONFIG);
 		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
 		statusMode = mode;
 	}
+
+
+
+ // >>>>>>>>>>>>>>> ЭТА ФУНКЦИЯ ПЕРЕМЕЩЕНА СЮДА <<<<<<<<<<<<<<<
+    function attemptFullScreen() {
+        console.log("🚀 Попытка запросить FullScreen после загрузки Godot.");
+        if (window.Telegram && window.Telegram.WebApp) {
+            let tg = window.Telegram.WebApp;
+            
+            // Используем expand() для лучшей совместимости на мобильных устройствах
+            if (tg.expand && tg.expand.isAvailable()) {
+                tg.expand();
+                console.log("Telegram.WebApp.expand() вызван.");
+            }
+
+            // Если доступен requestFullscreen (для Mini Apps 2.0+), используем его
+            if (tg.requestFullscreen && tg.requestFullscreen.isAvailable()) {
+                 tg.onEvent('fullscreenChanged', function() {
+                    console.log('fullscreenChanged event:', tg.isFullscreen ? 'Entered' : 'Exited');
+                });
+                tg.requestFullscreen();
+                console.log("Telegram.WebApp.requestFullscreen() вызван.");
+            }
+        }
+    }
+
+
 
 	function setStatusNotice(text) {
 		while (statusNotice.lastChild) {
@@ -290,7 +288,7 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
-			setStatusMode('hidden');
+			            setStatusMode('hidden'); // Оставляем этот вызов на месте, он запустит attemptFullScreen()
 		}, displayFailureNotice);
 	}
 }());
