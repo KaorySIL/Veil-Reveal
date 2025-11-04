@@ -4,6 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>Veil Reveal</title>
+
+    <!-- ДОБАВЬ ЭТУ СТРОКУ -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -149,46 +153,43 @@ background: #e5e5e5;
 		<script src="index.js"></script>
 		<script>
 
-// ВСТАВЬТЕ ЭТОТ КОД ПЕРЕД Godot инициализацией
-const debugDiv = document.createElement('div');
-debugDiv.style.cssText = `
-    position: fixed; top: 10px; left: 10px; 
-    background: rgba(0,0,0,0.8); color: white; 
-    padding: 10px; z-index: 10000; font-size: 12px;
-`;
-document.body.appendChild(debugDiv);
 
-function addDebugMessage(message) {
-    debugDiv.innerHTML += message + '<br>';
-    console.log(message);
+
+// Проверяем, инициализирован ли объект WebApp
+if (window.Telegram && window.Telegram.WebApp) {
+    let tg = window.Telegram.WebApp;
+
+    // Сначала рекомендуется развернуть приложение на максимальную высоту (для мобильных устройств)
+    if (tg.expand && tg.expand.isAvailable()) {
+        tg.expand();
+    }
+
+    // Затем запросить полноэкранный режим
+    if (tg.requestFullscreen && tg.requestFullscreen.isAvailable()) {
+        // Можно добавить обработчик, который сработает после попытки перехода в полноэкранный режим
+        tg.onEvent('fullscreenChanged', function() {
+            if (tg.isFullscreen) {
+                console.log('Приложение перешло в полноэкранный режим');
+            } else {
+                console.log('Приложение вышло из полноэкранного режима');
+            }
+        });
+        
+        // Вызываем метод запроса полноэкранного режима
+        tg.requestFullscreen();
+    }
+
+    // Метод для выхода из полноэкранного режима (можно привязать к кнопке)
+    function exitFullScreenMode() {
+        if (tg.exitFullscreen && tg.exitFullscreen.isAvailable()) {
+            tg.exitFullscreen();
+        }
+    }
 }
 
-addDebugMessage('🚀 Страница загружается...');
 
-// Запускаем проверку Telegram после полной загрузки
-window.addEventListener('load', function() {
-    addDebugMessage('📦 Страница полностью загружена');
-    
-    setTimeout(() => {
-        addDebugMessage('🔍 Проверяем Telegram...');
-        
-        if (window.Telegram?.WebApp) {
-            const tg = window.Telegram.WebApp;
-            addDebugMessage('✅ Telegram WebApp найден!');
-            
-            tg.expand();
-            addDebugMessage('📈 Expand выполнен');
-            
-            // Пробуем FullScreen
-            tg.viewport?.requestFullscreen?.();
-            tg.requestFullscreen?.();
-            viewport?.requestFullscreen?.();
-            addDebugMessage('🎯 FullScreen запрошен');
-        } else {
-            addDebugMessage('❌ Telegram WebApp не найден');
-        }
-    }, 1000);
-});
+
+
 
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":45980448,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
