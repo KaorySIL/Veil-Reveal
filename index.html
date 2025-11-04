@@ -252,40 +252,8 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 
-async function waitForTelegram() {
-    // Ждем пока появится Telegram.WebApp
-    while (!window.Telegram?.WebApp) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    console.log("✅ Telegram WebApp найден!");
-    initFullscreen();
-}
-
-async function initFullscreen() {
-    const statusDiv = document.createElement('div');
-    statusDiv.style.cssText = `
-        position: fixed; top: 10px; left: 10px; 
-        background: rgba(0,0,0,0.8); color: white; 
-        padding: 10px; z-index: 10000; font-size: 14px;
-    `;
-    document.body.appendChild(statusDiv);
-    
-    if (window.Telegram?.WebApp?.viewport?.requestFullscreen) {
-        try {
-            await Telegram.WebApp.viewport.requestFullscreen();
-            statusDiv.innerHTML = `✅ FullScreen: ${Telegram.WebApp.viewport.isFullscreen()}`;
-        } catch (error) {
-            statusDiv.innerHTML = `❌ FullScreen ошибка`;
-        }
-    } else {
-        statusDiv.innerHTML = '❌ Telegram WebApp не найден';
-    }
-}
-
-// Запускаем ожидание Telegram
-waitForTelegram();
-
+Telegram.WebApp.viewport.requestFullscreen();
+viewport.requestFullscreen();
 
 		</script>
 
