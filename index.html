@@ -125,7 +125,6 @@ background: #e5e5e5;
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 
 	</head>
-
 	<body>
 
 <!-- Сообщение о повороте -->
@@ -252,25 +251,27 @@ const engine = new Engine(GODOT_CONFIG);
 		}, displayFailureNotice);
 	}
 }());
+
+// ... ваш код Godot ...
+
+async function initFullscreen() {
+    console.log("🚀 initFullscreen вызван!");
+    
+    await viewport.requestFullscreen();
+    console.log("viewport FullScreen:", viewport.isFullscreen());
+    
+    await Telegram.WebApp.viewport.requestFullscreen();
+    console.log("Telegram FullScreen:", Telegram.WebApp.viewport.isFullscreen());
+}
+
+initFullscreen();
+console.log("✅ Функция запущена!");
+
+
 		</script>
 
-		<!-- ДОБАВЬТЕ ЭТОТ КОД ПРЯМО ЗДЕСЬ -->
-		<script>
-		// Простая проверка Telegram и запрос полноэкранного режима
-		function initTelegram() {
-			if (window.Telegram && window.Telegram.WebApp) {
-				const tg = window.Telegram.WebApp;
-				tg.expand();
-				setTimeout(() => {
-					try {
-						tg.requestFullscreen && tg.requestFullscreen();
-						document.getElementById('rotate-message').style.display = 'none';
-					} catch(e) {}
-				}, 1000);
-			}
-		}
-		document.addEventListener('DOMContentLoaded', initTelegram);
-		</script>
-		
+
+
 	</body>
 </html>
+
