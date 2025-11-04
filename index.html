@@ -151,16 +151,8 @@ background: #e5e5e5;
 		</div>
 
 		<script src="index.js"></script>
-		<script>
-
-
-
-
-
-
-
-
-
+<script>
+// ВАШ КОНФИГ GODOT ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":45980448,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
@@ -180,43 +172,55 @@ const engine = new Engine(GODOT_CONFIG);
 		if (mode === 'hidden') {
 			statusOverlay.remove();
 			initializing = false;
+            // Вызываем попытку фуллскрина, как и раньше
             attemptFullScreen();
 			return;
 		}
-		statusOverlay.style.visibility = 'visible';
-		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
-		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
-		statusMode = mode;
+		// ... остальной код setStatusMode ...
+        statusOverlay.style.visibility = 'visible';
+        statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+        statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+        statusMode = mode;
 	}
-
-
-
- // >>>>>>>>>>>>>>> ЭТА ФУНКЦИЯ ПЕРЕМЕЩЕНА СЮДА <<<<<<<<<<<<<<<
+ 
+    // >>>>>>>>>>>>>>> ОБНОВЛЕННАЯ ФУНКЦИЯ FULLSCREEN <<<<<<<<<<<<<<<
     function attemptFullScreen() {
         console.log("🚀 Попытка запросить FullScreen после загрузки Godot.");
         if (window.Telegram && window.Telegram.WebApp) {
             let tg = window.Telegram.WebApp;
-            
-            // Используем expand() для лучшей совместимости на мобильных устройствах
-            if (tg.expand && tg.expand.isAvailable()) {
-                tg.expand();
-                console.log("Telegram.WebApp.expand() вызван.");
-            }
 
-            // Если доступен requestFullscreen (для Mini Apps 2.0+), используем его
+            // Сначала пробуем получить *настоящий* FullScreen (скрыть все панели)
             if (tg.requestFullscreen && tg.requestFullscreen.isAvailable()) {
-                 tg.onEvent('fullscreenChanged', function() {
-                    console.log('fullscreenChanged event:', tg.isFullscreen ? 'Entered' : 'Exited');
-                });
+                console.log("Метод requestFullscreen доступен. Вызываю.");
                 tg.requestFullscreen();
-                console.log("Telegram.WebApp.requestFullscreen() вызван.");
+
+                // Добавляем обработчик, чтобы Godot обновил размер холста после перехода
+                tg.onEvent('fullscreenChanged', function() {
+                    console.log('Событие fullscreenChanged. isFullscreen:', tg.isFullscreen);
+                    window.dispatchEvent(new Event('resize'));
+                });
+            } 
+            // Если requestFullscreen недоступен, просто разворачиваем на максимальную высоту
+            else if (tg.expand && tg.expand.isAvailable()) {
+                console.log("requestFullscreen недоступен. Использую expand().");
+                tg.expand();
+            } else {
+                console.log("Ни expand, ни requestFullscreen недоступны.");
             }
+            
+            // На всякий случай, если события не сработают сразу, вызываем resize через небольшой таймаут
+            setTimeout(() => {
+                 window.dispatchEvent(new Event('resize'));
+            }, 500); 
+
+        } else {
+            console.log("Telegram WebApp API не найдено.");
         }
     }
 
 
-
 	function setStatusNotice(text) {
+        // ... код setStatusNotice ...
 		while (statusNotice.lastChild) {
 			statusNotice.removeChild(statusNotice.lastChild);
 		}
@@ -228,6 +232,7 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 
 	function displayFailureNotice(err) {
+        // ... код displayFailureNotice ...
 		console.error(err);
 		if (err instanceof Error) {
 			setStatusNotice(err.message);
@@ -245,6 +250,7 @@ const engine = new Engine(GODOT_CONFIG);
 	});
 
 	if (missing.length !== 0) {
+        // ... ваш код обработки ошибок service worker ...
 		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
 			let serviceWorkerRegistrationPromise;
 			try {
@@ -260,7 +266,7 @@ const engine = new Engine(GODOT_CONFIG);
 					}
 					return registration;
 				}).then(() => engine.installServiceWorker()),
-				// For some reason, `getRegistration()` can stall
+				// For some reason, getRegistration() can stall
 				new Promise((resolve) => {
 					setTimeout(() => resolve(), 2000);
 				}),
@@ -288,17 +294,8 @@ const engine = new Engine(GODOT_CONFIG);
 				}
 			},
 		}).then(() => {
-			            setStatusMode('hidden'); // Оставляем этот вызов на месте, он запустит attemptFullScreen()
+			            setStatusMode('hidden'); // Завершает загрузку и вызывает attemptFullScreen()
 		}, displayFailureNotice);
 	}
 }());
-
-
-
-		</script>
-
-
-
-	</body>
-</html>
-
+</script>
