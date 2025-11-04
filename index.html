@@ -252,8 +252,25 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 
-Telegram.WebApp.viewport.requestFullscreen();
-viewport.requestFullscreen();
+// ПРОБУЕМ ВСЕ ВОЗМОЖНЫЕ ВАРИАНТЫ
+if (window.Telegram?.WebApp) {
+    const tg = window.Telegram.WebApp;
+    
+    // 1. Сначала расширяем
+    tg.expand();
+    
+    // 2. Пробуем все способы включения FullScreen
+    setTimeout(() => {
+        // Вариант A - новый (через viewport)
+        tg.viewport?.requestFullscreen?.();
+        
+        // Вариант B - старый (напрямую)
+        tg.requestFullscreen?.();
+        
+        // Вариант C - глобальный viewport
+        viewport?.requestFullscreen?.();
+    }, 500);
+}
 
 		</script>
 
