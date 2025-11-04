@@ -252,20 +252,35 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 
-// ... ваш код Godot ...
-
 async function initFullscreen() {
-    console.log("🚀 initFullscreen вызван!");
+    // Создаем элемент для отображения статуса
+    const statusDiv = document.createElement('div');
+    statusDiv.style.cssText = `
+        position: fixed; 
+        top: 10px; 
+        left: 10px; 
+        background: rgba(0,0,0,0.8); 
+        color: white; 
+        padding: 10px; 
+        z-index: 10000;
+        font-size: 14px;
+    `;
+    document.body.appendChild(statusDiv);
     
-    await viewport.requestFullscreen();
-    console.log("viewport FullScreen:", viewport.isFullscreen());
-    
-    await Telegram.WebApp.viewport.requestFullscreen();
-    console.log("Telegram FullScreen:", Telegram.WebApp.viewport.isFullscreen());
+    // Пробуем включить FullScreen
+    if (window.Telegram?.WebApp?.viewport?.requestFullscreen) {
+        try {
+            await Telegram.WebApp.viewport.requestFullscreen();
+            statusDiv.innerHTML = `✅ FullScreen: ${Telegram.WebApp.viewport.isFullscreen()}`;
+        } catch (error) {
+            statusDiv.innerHTML = `❌ FullScreen ошибка: ${error.message}`;
+        }
+    } else {
+        statusDiv.innerHTML = '❌ Telegram WebApp не найден';
+    }
 }
 
 initFullscreen();
-console.log("✅ Функция запущена!");
 
 
 		</script>
