@@ -148,6 +148,48 @@ background: #e5e5e5;
 
 		<script src="index.js"></script>
 		<script>
+
+// ВСТАВЬТЕ ЭТОТ КОД ПЕРЕД Godot инициализацией
+const debugDiv = document.createElement('div');
+debugDiv.style.cssText = `
+    position: fixed; top: 10px; left: 10px; 
+    background: rgba(0,0,0,0.8); color: white; 
+    padding: 10px; z-index: 10000; font-size: 12px;
+`;
+document.body.appendChild(debugDiv);
+
+function addDebugMessage(message) {
+    debugDiv.innerHTML += message + '<br>';
+    console.log(message);
+}
+
+addDebugMessage('🚀 Страница загружается...');
+
+// Запускаем проверку Telegram после полной загрузки
+window.addEventListener('load', function() {
+    addDebugMessage('📦 Страница полностью загружена');
+    
+    setTimeout(() => {
+        addDebugMessage('🔍 Проверяем Telegram...');
+        
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            addDebugMessage('✅ Telegram WebApp найден!');
+            
+            tg.expand();
+            addDebugMessage('📈 Expand выполнен');
+            
+            // Пробуем FullScreen
+            tg.viewport?.requestFullscreen?.();
+            tg.requestFullscreen?.();
+            viewport?.requestFullscreen?.();
+            addDebugMessage('🎯 FullScreen запрошен');
+        } else {
+            addDebugMessage('❌ Telegram WebApp не найден');
+        }
+    }, 1000);
+});
+
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":45980448,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[]};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
@@ -252,54 +294,7 @@ const engine = new Engine(GODOT_CONFIG);
 	}
 }());
 
-// СОЗДАЕМ БЛОК ДЛЯ СООБЩЕНИЙ
-const debugDiv = document.createElement('div');
-debugDiv.style.cssText = `
-    position: fixed; 
-    top: 10px; 
-    left: 10px; 
-    background: rgba(0,0,0,0.8); 
-    color: white; 
-    padding: 10px; 
-    z-index: 10000;
-    font-size: 12px;
-    max-width: 300px;
-`;
-document.body.appendChild(debugDiv);
 
-function addDebugMessage(message) {
-    debugDiv.innerHTML += message + '<br>';
-    console.log(message); // дублируем в консоль
-}
-
-// ПРОВЕРЯЕМ И ВЫВОДИМ НА ЭКРАН
-addDebugMessage('🔍 Проверка Telegram...');
-
-if (window.Telegram?.WebApp) {
-    const tg = window.Telegram.WebApp;
-    addDebugMessage('✅ Telegram WebApp найден');
-    
-    addDebugMessage(`Viewport: ${!!tg.viewport}`);
-    addDebugMessage(`requestFullscreen: ${!!tg.viewport?.requestFullscreen}`);
-    addDebugMessage(`tg.requestFullscreen: ${!!tg.requestFullscreen}`);
-    addDebugMessage(`global viewport: ${!!viewport}`);
-    
-    // ПРОБУЕМ ВСЕ ВАРИАНТЫ
-    tg.expand();
-    addDebugMessage('📈 Expand выполнен');
-    
-    setTimeout(() => {
-        addDebugMessage('🔄 Пробуем FullScreen...');
-        
-        tg.viewport?.requestFullscreen?.();
-        tg.requestFullscreen?.();
-        viewport?.requestFullscreen?.();
-        
-        addDebugMessage('🎯 FullScreen запрошен');
-    }, 500);
-} else {
-    addDebugMessage('❌ Telegram WebApp не найден');
-}
 
 		</script>
 
